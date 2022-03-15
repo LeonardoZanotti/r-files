@@ -8,8 +8,7 @@ library(plyr)
 # turn off factors
 options(stringsAsFactors = FALSE)
 
-data_df <- read.csv(file = "./vaccination-data.csv", sep=",", quote="\"",
-                     header = T, stringsAsFactors = F)
+data_df <- read.csv(file = "./vaccination-data.csv", sep=",", quote="\"", header = T, stringsAsFactors = F)
 colnames(data_df)
 # [1] "COUNTRY"                              "ISO3"                                
 # [3] "WHO_REGION"                           "DATA_SOURCE"                         
@@ -44,18 +43,27 @@ data_other = data_df[data_df$WHO_REGION == 'OTHER', ]
 data_searo = data_df[data_df$WHO_REGION == 'SEARO', ]
 data_wpro = data_df[data_df$WHO_REGION == 'WPRO', ]
 
-by(data_df, seq_len(nrow(data_df)), function(row) row$COUNTRY <- substr(row$COUNTRY, 1, 3))
+# by(data_df, seq_len(nrow(data_df)), function(row) row$COUNTRY <- substr(row$COUNTRY, 1, 3))
 countries_df = ddply(data_df, .(COUNTRY, TOTAL_VACCINATIONS, WHO_REGION), function(row) row$COUNTRY = substr(row$COUNTRY, 1, 3))
 head(countries_df)
 qplot(x = countries_df$COUNTRY,
       y = countries_df$TOTAL_VACCINATIONS)
 
+# Vacinas por país por cada continente
 continents = c("AFRO", "AMRO", "EMRO", "EURO", "OTHER", "SEARO", "WPRO")
 for (continent in continents) {
   new_df = countries_df[countries_df$WHO_REGION == continent, ]
   qplot(x = new_df$V1,
         y = new_df$TOTAL_VACCINATIONS,
-        main = paste("Vaccinations per country of ", continent),
+        main = paste("Vaccinations per country of", continent),
         xlab = "Countries",
         ylab = "Vaccines")
 }
+
+new_df = data_df[data_df$WHO_REGION == continents[1], ]
+qplot(x = new_df$TOTAL_VACCINATIONS,
+      y = new_df$COUNTRY,
+      main = paste("Vaccinations per country of", continents[1]),
+      xlab = "Vaccines",
+      ylab = "Countries")
+
